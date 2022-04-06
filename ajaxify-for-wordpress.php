@@ -24,7 +24,7 @@ jQuery( document ).ready(function() {
 		refresh : <?php echo get_option('refresh');?>,
 		
 	});
-});
+
 	<?php if (get_option('pronto_beforeload')=="true"){?>
 window.addEventListener('pronto.beforeload.render', function(event){
 	<?php echo get_option('pronto_beforeload');?>
@@ -42,6 +42,7 @@ window.addEventListener('pronto,load', function(event){
 	<?php echo get_option('pronto_load');?>
 })
 	<?php }?>
+});
 </script>
 <?php }
 });
