@@ -57,7 +57,7 @@ add_action( 'admin_init', function () {
 	add_option( 'pronto_render ', null);
 	add_option( 'pronto_load ', null);
 	register_setting( 'ajaxify_for_wp', 'ajaxify_enabled', ['default'=>'false']);
-	register_setting( 'ajaxify_for_wp', 'elements', ['default'=>'#content,#sidebar,#wpadminbar']);
+	register_setting( 'ajaxify_for_wp', 'elements', ['default'=>'body']);
 	register_setting( 'ajaxify_for_wp', 'requestDelay', ['default'=>'0']);
 	register_setting( 'ajaxify_for_wp', 'refresh', ['default'=>'false']);
 	register_setting( 'ajaxify_for_wp', 'pronto_beforeload', ['default'=>null]);
