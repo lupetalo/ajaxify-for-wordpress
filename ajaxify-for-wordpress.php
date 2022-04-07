@@ -3,6 +3,15 @@
  Plugin Name: Ajaxify For Wordpress
 */
 
+
+/*
+$('.elementor-widget').each((myElementDomNode)=>{
+console.log(${myElementorDomNode.data('widget_type'));
+elementorFrontend.triggerHook(`frontend/element_ready/${myElementorDomNode.data('widget_type')}`)
+})
+
+*/
+
 // add main js file
 add_action( 'wp_enqueue_scripts', function () {
 	wp_register_script( 'ajaxify', plugins_url( '/assets/ajaxify.js' , __FILE__ ) );
@@ -13,51 +22,60 @@ add_action( 'wp_enqueue_scripts', function () {
 
 
 // add inline code to footer
-add_action('wp_footer', function (){ 
+add_action('wp_head', function (){ 
 if (get_option('ajaxify_enabled')=="true"){?>
 <script>
 jQuery( document ).ready(function() {
 	console.log( "ready!" );
 	let ajaxify = new Ajaxify({
+		selector: 'a[href^="<?php echo site_url();?>"]',
 		elements: '<?php echo get_option('elements');?>',
 		requestDelay : '<?php echo get_option('requestDelay');?>',
 		refresh : <?php echo get_option('refresh');?>,
 		
 	});
 
-	<?php if (get_option('pronto_beforeload')=="true"){?>
-window.addEventListener('pronto.beforeload.render', function(event){
+	
+	<?php if (get_option('pronto_beforeload')){?>
+window.addEventListener('pronto.beforeload', function(event){
 	<?php echo get_option('pronto_beforeload');?>
+	event.stopPropagation();
 })
 	<?php }?>
 	
-	<?php if (get_option('pronto_render')=="true"){?>
+	<?php if (get_option('pronto_render')){?>
 window.addEventListener('pronto.render', function(event){
 	<?php echo get_option('pronto_render');?>
+	event.stopPropagation();
 })
 	<?php }?>
 	
-	<?php if (get_option('pronto_load')=="true"){?>
-window.addEventListener('pronto,load', function(event){
+	<?php if (get_option('pronto_load')){?>
+window.addEventListener('pronto.load', function(event){
 	<?php echo get_option('pronto_load');?>
+	event.stopPropagation();
 })
 	<?php }?>
 });
+	
+	
+window.addEventListener('pronto.render', function(event){
+	if (window.elementorFrontend && window.elementorFrontend!='undefined'){
+		window.elementorFrontend.init();
+		event.stopPropagation();
+	}
+	
+})	
+	
+	
 </script>
-<?php }
-});
+<?php }});
 
 // register settings
 add_action( 'admin_init', function () {
-	add_option( 'ajaxify_enabled ', 'false');
-	add_option( 'elements', '#content');
-	add_option( 'requestDelay', '0');
-	add_option( 'refresh ', 'false');
-	add_option( 'pronto_beforeload ', null);
-	add_option( 'pronto_render ', null);
-	add_option( 'pronto_load ', null);
 	register_setting( 'ajaxify_for_wp', 'ajaxify_enabled', ['default'=>'false']);
-	register_setting( 'ajaxify_for_wp', 'elements', ['default'=>'body']);
+	register_setting( 'ajaxify_for_wp', 'elements', ['default'=>'#content,#sidebar,#wpadminbar']);
+	register_setting( 'ajaxify_for_wp', 'triggres', ['default'=>'a:not(.no-ajaxy)']);
 	register_setting( 'ajaxify_for_wp', 'requestDelay', ['default'=>'0']);
 	register_setting( 'ajaxify_for_wp', 'refresh', ['default'=>'false']);
 	register_setting( 'ajaxify_for_wp', 'pronto_beforeload', ['default'=>null]);
@@ -117,6 +135,15 @@ function ajaxify_for_wp_options_page(){?>
 				separate elements with comma <code>,</code> for example: <i>#elementID,.elementClass,footer</i></p>
 			</td>
 		</tr>
+			
+		<tr valign="top">
+			<th scope="row"><label for="triggres">Elements that trigger ajax</label></th>
+			<td>
+				<input class="regular-text" type="text" id="triggres" name="triggres" value="<?php echo get_option('triggres');?>" />
+				<p class="description">Use CSS Selectors, for example: <code>#elementID</code> or <code>.elementClass</code><br>
+				separate elements with comma <code>,</code> for example: <i>#elementID,.elementClass,footer</i></p>
+			</td>
+		</tr>
 		</table>
 		
 		<h3 class="title">Ajaxify Options</h3>
@@ -147,21 +174,21 @@ function ajaxify_for_wp_options_page(){?>
 			<tr valign="top">
 				<th scope="row"><label for="pronto_beforeload"><code>pronto.beforeload</code></label></th>
 				<td>
-					<textarea name="pronto_beforeload" id="pronto_beforeload" class="large-text code" rows="5"></textarea>
+					<textarea name="pronto_beforeload" id="pronto_beforeload" class="large-text code" rows="5"><?php echo get_option('pronto_beforeload');?></textarea>
 					<p class="description">Fired before new Pronto request is loaded</p>
 				</td>
 			</tr>	
 			<tr valign="top">
 				<th scope="row"><label for="pronto_render"><code>pronto.render</code></label></th>
 				<td>
-					<textarea name="pronto_render" id="pronto_render" class="large-text code" rows="5"></textarea>
+					<textarea name="pronto_render" id="pronto_render" class="large-text code" rows="5"><?php echo get_option('pronto_render');?></textarea>
 					<p class="description">Fired after new Pronto request is rendered. <b>This is where you would reinitialise JS elements</b></p>
 				</td>
 			</tr>
 			<tr valign="top">
 				<th scope="row"><label for="pronto_load"><code>pronto.load</code></label></th>
 				<td>
-					<textarea name="pronto_load" id="pronto_load" class="large-text code" rows="5"></textarea>
+					<textarea name="pronto_load" id="pronto_load" class="large-text code" rows="5"><?php echo get_option('pronto_load');?></textarea>
 					<p class="description">Fired after new Pronto request is loaded</p>
 				</td>
 			</tr>
