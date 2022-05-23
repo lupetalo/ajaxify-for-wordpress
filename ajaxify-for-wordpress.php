@@ -22,9 +22,9 @@ add_action('wp_head', function (){
 	$pronto_render=get_option('pronto_render');
 	$pronto_load=get_option('pronto_load');
 
-	if (empty($elements) $elements='body';
-	if (empty($requestDelay) $requestDelay='0';
-	if (empty($refresh) $refresh='false';
+	if (empty($elements)) $elements='body';
+	if (empty($requestDelay)) $requestDelay='0';
+	if (empty($refresh)) $refresh='false';
 
 if (get_option('ajaxify_enabled')=="true"){?>
 <script>
