@@ -3,15 +3,6 @@
  Plugin Name: Ajaxify For Wordpress
 */
 
-
-/*
-$('.elementor-widget').each((myElementDomNode)=>{
-console.log(${myElementorDomNode.data('widget_type'));
-elementorFrontend.triggerHook(`frontend/element_ready/${myElementorDomNode.data('widget_type')}`)
-})
-
-*/
-
 // add main js file
 add_action( 'wp_enqueue_scripts', function () {
 	wp_register_script( 'ajaxify', plugins_url( '/assets/ajaxify.js' , __FILE__ ) );
@@ -21,53 +12,57 @@ add_action( 'wp_enqueue_scripts', function () {
 });
 
 
-// add inline code to footer
+// add inline code to wp_head
 add_action('wp_head', function (){ 
+	// handle blanks and get options
+	$requestDelay=get_option('requestDelay');
+	$refresh=get_option('refresh');
+	$elements=get_option('elements');
+	$pronto_beforeload=get_option('pronto_beforeload');
+	$pronto_render=get_option('pronto_render');
+	$pronto_load=get_option('pronto_load');
+
+	if (empty($elements) $elements='body';
+	if (empty($requestDelay) $requestDelay='0';
+	if (empty($refresh) $refresh='false';
+
 if (get_option('ajaxify_enabled')=="true"){?>
 <script>
 jQuery( document ).ready(function() {
 	console.log( "ready!" );
 	let ajaxify = new Ajaxify({
 		selector: 'a[href^="<?php echo site_url();?>"]',
-		elements: '<?php echo get_option('elements');?>',
-		requestDelay : '<?php echo get_option('requestDelay');?>',
-		refresh : <?php echo get_option('refresh');?>,
+		elements: '<?php echo $elements;?>',
+		requestDelay : '<?php echo $requestDelay;?>',
+		refresh : '<?php echo $refresh;?>',
 		
 	});
-
-	
-	<?php if (get_option('pronto_beforeload')){?>
+	<?php if (!empty($pronto_beforeload)){?>
 window.addEventListener('pronto.beforeload', function(event){
-	<?php echo get_option('pronto_beforeload');?>
+	<?php echo $pronto_beforeload;?>
 	event.stopPropagation();
 })
 	<?php }?>
-	
-	<?php if (get_option('pronto_render')){?>
+	<?php if (!empty($pronto_render)){?>
 window.addEventListener('pronto.render', function(event){
-	<?php echo get_option('pronto_render');?>
+	<?php echo $pronto_render;?>
 	event.stopPropagation();
 })
 	<?php }?>
-	
-	<?php if (get_option('pronto_load')){?>
+	<?php if (!empty($pronto_load)){?>
 window.addEventListener('pronto.load', function(event){
-	<?php echo get_option('pronto_load');?>
+	<?php echo $pronto_load;?>
 	event.stopPropagation();
 })
 	<?php }?>
 });
-	
-	
 window.addEventListener('pronto.render', function(event){
 	if (window.elementorFrontend && window.elementorFrontend!='undefined'){
 		window.elementorFrontend.init();
 		event.stopPropagation();
 	}
 	
-})	
-	
-	
+})
 </script>
 <?php }});
 
