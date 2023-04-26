@@ -2,7 +2,7 @@
 /*
  Plugin Name: Ajaxify For Wordpress
  GitHub Plugin URI: https://github.com/lupetalo/ajaxify-for-wordpress
- Version: 1.1
+ Version: 1.2
 */
 
 // add main js file
